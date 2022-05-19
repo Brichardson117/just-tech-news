@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { User } = require('../../models');
+const { User, Post, Vote } = require('../../models');
 
 // GET /api/users
 router.get('/', (req, res) => {
@@ -18,10 +18,18 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
     //getting only one piece of data back. similar to SELECT * FROM user WHERE id= 1
     User.findOne({
-        attributes: { exclude: ['password'] },
-        where: {
-            id: req.params.id
-        }
+       include: [
+           {
+               model: Post,
+               attributes: ['id', 'title', 'post_url', 'created_at']
+           },
+           {
+               model:Post,
+               attributes: ['title'],
+               through: Vote,
+               as: 'voted_posts',
+           }
+       ]
     })
         .then(dbUserData => {
             if (!dbUserData) {
@@ -66,11 +74,12 @@ router.post('/login', (req, res) => {
         }
         //Verify User   
         const validPassword = dbUserData.checkPassword(req.body.password);
+
         if (!validPassword) {
             res.status(400).json({ message: 'Incorrect Password!' });
             return;
         }
-        
+
         res.json({ user: dbUserData, message: 'You are now logged in!' });
     });
 });

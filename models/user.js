@@ -1,7 +1,5 @@
-const bcrypt = require('bcrypt')
-const { uniq } = require('lodash');
 const { Model, DataTypes } = require('sequelize');
-const { validate } = require('uuid');
+const bcrypt = require('bcrypt')
 const sequelize = require('../config/connection');
 
 //create our user model
