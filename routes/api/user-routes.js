@@ -18,18 +18,22 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
     //getting only one piece of data back. similar to SELECT * FROM user WHERE id= 1
     User.findOne({
-       include: [
-           {
-               model: Post,
-               attributes: ['id', 'title', 'post_url', 'created_at']
-           },
-           {
-               model:Post,
-               attributes: ['title'],
-               through: Vote,
-               as: 'voted_posts',
-           }
-       ]
+        attributes: { exclude: ['password'] },
+        where: {
+            id: req.params.id
+        },
+        include: [
+            {
+                model: Post,
+                attributes: ['id', 'title', 'post_url', 'created_at']
+            },
+            {
+                model: Post,
+                attributes: ['title'],
+                through: Vote,
+                as: 'voted_posts',
+            }
+        ]
     })
         .then(dbUserData => {
             if (!dbUserData) {

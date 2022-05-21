@@ -1,6 +1,7 @@
 const User = require('./user');
 const Post = require('./post');
 const Vote = require('./vote');
+const Comment = require('./comments');
 
 // create associations
 User.hasMany(Post, {
@@ -8,11 +9,23 @@ User.hasMany(Post, {
 });
 
 Post.belongsTo(User, {
-    foreignKey: 'user_id',
+    foreignKey: 'user_id'
+});
+//With these two .belongsToMany() methods in place, we're allowing both the User and Post models to query each other's information in the context of a vote.
+User.belongsToMany(Post, {
+    through: Vote,
+    as: 'voted_post',
+    foreignKey: 'user_id'
+});
+
+Post.belongsToMany(User, {
+    through: Vote,
+    as: 'voted_posts',
+    foreignKey: 'post_id'
 });
 
 Vote.belongsTo(User, {
-    foreignKey: 'user_id'
+    foreignKey: 'post_id'
 });
 
 Vote.belongsTo(Post, {
@@ -26,17 +39,23 @@ User.hasMany(Vote, {
 Post.hasMany(Vote, {
     foreignKey: 'post_id'
 });
-//With these two .belongsToMany() methods in place, we're allowing both the User and Post models to query each other's information in the context of a vote.
-User.belongsToMany(Post, {
-    through: Vote,
-    as: 'voted_posts',
+
+Comment.belongsTo(User, {
+    foreignKey: ' user_id'
+});
+
+Comment.belongsTo(Post, {
+    foreignKey: 'user_id'
+});
+
+User.hasMany(Comment,{
     foreignKey:'user_id'
 });
 
-Post.belongsToMany(User, {
-    through: Vote,
-    as: 'vote_posts',
+Post.hasMany(Comment, {
     foreignKey: 'post_id'
 });
 
-module.exports = { User, Post, Vote };
+
+
+module.exports = { User, Post, Vote, Comment };
